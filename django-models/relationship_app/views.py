@@ -28,7 +28,7 @@ def register(request):
             return redirect('home')  # Redirect to home page after successful registration
     else:
         form = UserCreationForm()
-    return render(request, 'users/register.html', {'form': form})
+    return render(request, 'relationship_app/register.html', {'form': form})
 
 class LoginView(LoginView):
     template_name = 'users/login.html'
