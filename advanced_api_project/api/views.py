@@ -1,6 +1,6 @@
 from django.shortcuts import render
 # from rest_framework import generics
-from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Book, Author
 from serializers import BookSerializer
 from django.urls import reverse_lazy
