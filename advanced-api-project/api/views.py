@@ -45,11 +45,17 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView,
 from .serializers import BookSerializer
 from .models import Book
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 class BookListView(ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['title', 'author', 'publication_year']
+    search_fields = ['title', 'author']
+    ordering_fields = ['title', 'publication_year']
 
 
 class BookDetailView(RetrieveAPIView):
