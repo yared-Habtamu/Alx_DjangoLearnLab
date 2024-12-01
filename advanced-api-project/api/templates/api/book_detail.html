@@ -8,8 +8,6 @@
 <body>
     <h1>{{ object.title }}</h1>
     <p>Author: {{ object.author }}</p>
-    <p>Summary: {{ object.summary }}</p>
-    <p>ISBN: {{ object.isbn }}</p>
     <a href="{% url 'book-edit' object.pk %}">Edit</a>
     <a href="{% url 'book-delete' object.pk %}">Delete</a>
     <a href="{% url 'book-list' %}">Back to book list</a>
