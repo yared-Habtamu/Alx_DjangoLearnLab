@@ -40,7 +40,7 @@
 #     template_name = 'api/book_confirm_delete.html'
 #
 # # Create your views here.
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
 from .serializers import BookSerializer
 from .models import Book
@@ -67,7 +67,7 @@ class BookCreateView(CreateAPIView):
 class BookUpdateView(UpdateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class BookDeleteView(DestroyAPIView):
