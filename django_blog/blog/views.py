@@ -51,7 +51,7 @@ class ProfileView(View):
 
 # Q2
 
-class PostListView(ListView):
+class PostByTagListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
