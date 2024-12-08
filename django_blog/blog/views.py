@@ -7,7 +7,11 @@ from django.contrib.auth.forms import UserChangeForm, User
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-from .models import Post
+from .models import Post, Comment
+from .forms import CommentForm
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
+
 
 
 # Create your views here.
@@ -44,7 +48,7 @@ class ProfileView(View):
         return render(request, 'blog/profile.html', {'form': form})
 
 
-#Q2
+# Q2
 
 class PostListView(ListView):
     model = Post
@@ -52,10 +56,19 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-created_at']  # Show newest posts first
 
+
 # DetailView
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = self.object.comments.all()
+        if self.request.user.is_authenticated:
+            context['comment_form'] = CommentForm()
+        return context
+
 
 # CreateView
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -66,6 +79,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
+
 
 # UpdateView
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -81,6 +95,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         post = self.get_object()
         return self.request.user == post.author
 
+
 # DeleteView
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
@@ -90,3 +105,39 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
+
+
+# PostDetailView already has comments logic; add the below view for handling CRUD
+class CommentCreateView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+        return redirect('post-detail', pk=pk)
+
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    # def get_success_url(self):
+    #     return reverse('post-detail', kwargs={'pk': self.object.post.pk})
