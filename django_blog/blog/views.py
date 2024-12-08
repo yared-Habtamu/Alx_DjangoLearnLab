@@ -10,8 +10,9 @@ from django.urls import reverse_lazy
 from .models import Post, Comment
 from .forms import CommentForm
 from django.shortcuts import get_object_or_404
+from .forms import PostForm
 from django.http import HttpResponseRedirect
-
+from django.db.models import Q
 
 
 # Create your views here.
@@ -62,6 +63,12 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
 
+    def get_queryset(self):
+        tag_name = self.kwargs.get('tag_name')
+        if tag_name:
+            return Post.objects.filter(tags__name=tag_name)
+        return Post.objects.all()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['comments'] = self.object.comments.all()
@@ -74,6 +81,7 @@ class PostDetailView(DetailView):
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     fields = ['title', 'content']
+    form_class = PostForm
     template_name = 'blog/post_form.html'
 
     def form_valid(self, form):
@@ -86,6 +94,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     fields = ['title', 'content']
     template_name = 'blog/post_form.html'
+    form_class = PostForm
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -105,7 +114,6 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
-
 
 
 # PostDetailView already has comments logic; add the below view for handling CRUD
@@ -141,3 +149,14 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     # def get_success_url(self):
     #     return reverse('post-detail', kwargs={'pk': self.object.post.pk})
+
+
+class PostSearchView(ListView):
+    model = Post
+    template_name = 'blog/search_results.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        return Post.objects.filter(
+            Q(title__icontains=query) | Q(content__icontains=query) | Q(tags__name__icontains=query)).distinct()
