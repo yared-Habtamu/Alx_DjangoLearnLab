@@ -1,16 +1,19 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
-
+from .models import CustomUser
 # Get the user model dynamically
 User = get_user_model()
 
+
+
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField()  # Explicitly declare the password field
+    followers_count = serializers.IntegerField(source='followers.count', read_only=True)
+    following_count = serializers.IntegerField(source='following.count', read_only=True)
 
     class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'password', 'bio', 'profile_picture']
+        model = CustomUser
+        fields = ['id', 'username', 'bio', 'profile_picture', 'followers_count', 'following_count']
 
     def create(self, validated_data):
         # Create a new user using `get_user_model().objects.create_user`
