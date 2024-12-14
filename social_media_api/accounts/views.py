@@ -1,13 +1,23 @@
 from rest_framework import generics  # For GenericAPIView
-from rest_framework.permissions import IsAuthenticated  # For ensuring the user is authenticated
+from rest_framework import permissions  # For ensuring the user is authenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import CustomUser
 from .serializers import UserSerializer
 
+
+class UserListView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]  # Ensure only authenticated users can access
+    serializer_class = UserSerializer
+
+    def get(self, request):
+        users = CustomUser.objects.all()  # Fetch all users
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 # View for following a user
 class FollowUserView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can follow
+    permission_classes = [permissions.IsAuthenticated]  # Ensure only authenticated users can follow
     serializer_class = UserSerializer
 
     def post(self, request, user_id):
@@ -20,9 +30,10 @@ class FollowUserView(generics.GenericAPIView):
         except CustomUser.DoesNotExist:
             return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
+
 # View for unfollowing a user
 class UnfollowUserView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can unfollow
+    permission_classes = [permissions.IsAuthenticated]  # Ensure only authenticated users can unfollow
     serializer_class = UserSerializer
 
     def post(self, request, user_id):
