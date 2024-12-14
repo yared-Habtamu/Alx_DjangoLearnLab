@@ -38,7 +38,7 @@ class LikePostView(generics.GenericAPIView):
         try:
             post = Post.objects.get(pk=pk)
             # Ensure user cannot like the post multiple times
-            if Like.objects.filter(user=request.user, post=post).exists():
+            if Like.objects.get_or_create(user=request.user, post=post):
                 return Response({"error": "You already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
 
             # Create the like
@@ -53,7 +53,7 @@ class LikePostView(generics.GenericAPIView):
                 target_object_id=post.id,
                 target=post
             )
-            notification.save()
+            Notification.objects.create
 
             return Response({"message": "Post liked successfully."}, status=status.HTTP_201_CREATED)
         except Post.DoesNotExist:
@@ -73,4 +73,4 @@ class UnLikePostView(generics.GenericAPIView):
 
             return Response({"error": "You haven't liked this post."}, status=status.HTTP_400_BAD_REQUEST)
         except Post.DoesNotExist:
-            return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Post not found."}, generics.get_object_or_404(Post, pk=pk))
