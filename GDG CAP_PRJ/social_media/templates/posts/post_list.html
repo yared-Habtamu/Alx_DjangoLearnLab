@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Stories -->
+    <div class="stories">
+        {% for user in suggested_users %}
+        <div class="story">
+            <div class="story-avatar">
+                <img src="{{ user.profile.image.url }}" alt="{{ user.username }}" width="62" height="62">
+            </div>
+            <div class="story-username">{{ user.username|truncatechars:10 }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Posts -->
+    {% for post in posts %}
+    <div class="post-card">
+        <!-- Post Header -->
+        <div class="post-header">
+            <img src="{{ post.user.profile.image.url }}" class="post-avatar" alt="{{ post.user.username }}">
+            <a href="{% url 'user-profile' post.user.id %}" class="post-username">{{ post.user.username }}</a>
+        </div>
+
+        <!-- Post Image -->
+        {% if post.image %}
+        <img src="{{ post.image.url }}" class="post-image" alt="Post image">
+        {% endif %}
+
+        <!-- Post Actions -->
+        <div class="post-actions">
+            <button class="post-action like-btn" data-post-id="{{ post.id }}">
+                <i class="far fa-heart"></i>
+            </button>
+            <button class="post-action">
+                <i class="far fa-comment"></i>
+            </button>
+            <button class="post-action">
+                <i class="far fa-paper-plane"></i>
+            </button>
+            <button class="post-action" style="margin-left: auto;">
+                <i class="far fa-bookmark"></i>
+            </button>
+        </div>
+
+        <!-- Post Details -->
+        <div class="post-likes">{{ post.likes.count }} likes</div>
+        <div class="post-caption">
+            <a href="{% url 'user-profile' post.user.id %}" class="post-username">{{ post.user.username }}</a>
+            {{ post.content }}
+        </div>
+        <div class="post-comments">View all {{ post.comments.count }} comments</div>
+        <div class="post-time">{{ post.created_at|timesince }} ago</div>
+
+        <!-- Comment Input -->
+        <div class="comment-input">
+            <input type="text" placeholder="Add a comment...">
+            <button type="submit">Post</button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

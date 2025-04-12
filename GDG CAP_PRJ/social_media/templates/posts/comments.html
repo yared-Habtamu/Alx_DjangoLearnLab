@@ -1,0 +1,18 @@
+<div class="comments-list">
+    {% for comment in post.comments.all %}
+    <div class="comment" data-comment-id="{{ comment.id }}">
+        <div class="comment-header">
+            <img src="{% if comment.user.profile.image %}{{ comment.user.profile.image.url }}{% else %}{% static 'images/avatars/default.svg' %}{% endif %}"
+                 class="comment-avatar"
+                 alt="{{ comment.user.username }}">
+            <a href="{% url 'user-profile' comment.user.id %}" class="comment-username">{{ comment.user.username }}</a>
+            <span class="comment-date">{{ comment.created_at|timesince }} ago</span>
+        </div>
+        <div class="comment-content">
+            {{ comment.content|linebreaksbr }}
+        </div>
+    </div>
+    {% empty %}
+    <p class="no-comments">No comments yet. Be the first to comment!</p>
+    {% endfor %}
+</div>

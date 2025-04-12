@@ -1,0 +1,12 @@
+<div class="follow-actions">
+    <form class="follow-form" method="POST" action="{% url 'user-follow' user.id %}">
+        {% csrf_token %}
+        <button type="submit" class="follow-btn">
+            {% if is_following %}
+                Unfollow
+            {% else %}
+                Follow
+            {% endif %}
+        </button>
+    </form>
+</div>

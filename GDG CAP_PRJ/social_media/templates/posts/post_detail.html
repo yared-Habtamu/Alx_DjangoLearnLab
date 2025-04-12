@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/posts.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="post-detail">
+    <!-- Post Header -->
+    <div class="post-header">
+        <img src="{% if post.user.profile.image %}{{ post.user.profile.image.url }}{% else %}{% static 'images/avatars/default.svg' %}{% endif %}"
+             class="post-avatar"
+             alt="{{ post.user.username }}">
+        <a href="{% url 'user-profile' post.user.id %}" class="post-username">{{ post.user.username }}</a>
+        {% if post.user == request.user %}
+        <div class="post-actions">
+            <a href="{% url 'post-update' post.id %}" class="btn btn-edit">✏️ Edit</a>
+            <a href="{% url 'post-delete' post.id %}" class="btn btn-delete">🗑️ Delete</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Post Content -->
+    <div class="post-content">
+        <p>{{ post.content }}</p>
+        {% if post.image %}
+        <img src="{{ post.image.url }}" alt="Post image" class="post-image">
+        {% endif %}
+    </div>
+
+    <!-- Post Stats -->
+    <div class="post-stats">
+        {% include 'posts/like_actions.html' %}
+        <span class="comment-count">{{ post.comments.count }} comments</span>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h3>Comments</h3>
+        {% include 'posts/comments.html' %}
+
+        {% if request.user.is_authenticated %}
+        <form method="post" class="comment-form" action="{% url 'post-comment' post.id %}">
+            {% csrf_token %}
+            <textarea name="content" placeholder="Add a comment..." required></textarea>
+            <button type="submit" class="btn btn-primary">Post Comment</button>
+        </form>
+        {% else %}
+        <p class="login-prompt"><a href="{% url 'login' %}">Login</a> to comment</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/posts.js' %}"></script>
+{% endblock %}

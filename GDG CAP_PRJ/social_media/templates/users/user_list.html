@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/users.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="user-list-container">
+    <h1>Users</h1>
+    
+    <form method="get" class="search-form">
+        <input type="text" name="search" placeholder="Search users..." value="{{ request.GET.search }}">
+        <button type="submit">Search</button>
+    </form>
+    
+    <div class="user-list">
+        {% for user in users %}
+        <div class="user-card">
+            <img src="{{ user.profile.image.url }}" alt="{{ user.username }}" class="user-card-avatar">
+            <div class="user-info">
+                <a href="{% url 'user-profile' user.id %}">{{ user.username }}</a>
+                {% if user != request.user %}
+                <button class="follow-btn" 
+                        data-user-id="{{ user.id }}" 
+                        data-action="{% if user in request.user.following.all %}unfollow{% else %}follow{% endif %}">
+                    {% if user in request.user.following.all %}Unfollow{% else %}Follow{% endif %}
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% include 'includes/pagination.html' %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/users.js' %}"></script>
+{% endblock %}

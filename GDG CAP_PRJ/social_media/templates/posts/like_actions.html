@@ -1,0 +1,13 @@
+<!-- posts/like_actions.html -->
+<div class="like-actions">
+    <form class="like-form" method="POST" action="{% url 'post-like' post.id %}">
+        {% csrf_token %}
+        <button type="submit" class="like-btn" data-post-id="{{ post.id }}">
+            <i class="{% if request.user in post.likes.all %}fas{% else %}far{% endif %} fa-heart"></i>
+            <span class="btn-text">
+                {% if request.user in post.likes.all %}Unlike{% else %}Like{% endif %}
+            </span>
+        </button>
+        <span class="like-count">{{ post.likes.count }}</span>
+    </form>
+</div>

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-header">
+        <div class="profile-avatar-container">
+            <img src="{{ user.profile.image.url }}" class="profile-avatar" alt="{{ user.username }}">
+        </div>
+
+        <div class="profile-info">
+            <div class="profile-username">{{ user.username }}</div>
+
+            <div class="profile-stats">
+                <div class="stat">
+                    <span class="stat-count">{{ posts_count }}</span>
+                    <span class="stat-label">posts</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-count">{{ followers_count }}</span>
+                    <span class="stat-label">followers</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-count">{{ following_count }}</span>
+                    <span class="stat-label">following</span>
+                </div>
+            </div>
+
+            <div class="profile-bio">
+                <h2>{{ user.profile.full_name }}</h2>
+                <p>{{ user.profile.bio }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-tabs">
+        <button class="tab-btn active"><i class="fas fa-table"></i> POSTS</button>
+        <button class="tab-btn"><i class="fas fa-bookmark"></i> SAVED</button>
+        <button class="tab-btn"><i class="fas fa-user-tag"></i> TAGGED</button>
+    </div>
+
+    <div class="profile-posts">
+        {% for post in user_posts %}
+        <div class="profile-post">
+            <img src="{{ post.image.url }}" alt="Post">
+            <div class="post-overlay">
+                <span><i class="fas fa-heart"></i> {{ post.likes.count }}</span>
+                <span><i class="fas fa-comment"></i> {{ post.comments.count }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
